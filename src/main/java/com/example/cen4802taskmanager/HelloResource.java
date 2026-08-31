@@ -3,6 +3,7 @@ package com.example.cen4802taskmanager;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 
 import java.util.ArrayList;
@@ -41,7 +42,16 @@ public class HelloResource {
 
     @GET
     @Produces(MediaType.TEXT_HTML)
-    public String getTasks() {
+    public String getTasks(@QueryParam("complete") Integer taskId) {
+
+        if (taskId != null) {
+            for (Task task : tasks) {
+                if (task.getId() == taskId) {
+                    task.setCompleted(true);
+                    break;
+                }
+            }
+        }
 
         StringBuilder html = new StringBuilder();
 
@@ -99,6 +109,16 @@ public class HelloResource {
         html.append("font-weight: bold;");
         html.append("}");
 
+        html.append(".button {");
+        html.append("display: inline-block;");
+        html.append("padding: 8px 14px;");
+        html.append("margin-top: 8px;");
+        html.append("background-color: #2563eb;");
+        html.append("color: white;");
+        html.append("text-decoration: none;");
+        html.append("border-radius: 5px;");
+        html.append("}");
+
         html.append("</style>");
         html.append("</head>");
 
@@ -137,6 +157,12 @@ public class HelloResource {
             }
 
             html.append("</p>");
+
+            if (!task.isCompleted()) {
+                html.append("<a class='button' href='?complete=");
+                html.append(task.getId());
+                html.append("'>Mark as Completed</a>");
+            }
 
             html.append("</div>");
         }
