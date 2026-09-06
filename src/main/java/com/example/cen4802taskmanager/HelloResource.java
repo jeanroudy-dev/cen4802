@@ -125,7 +125,7 @@ public class HelloResource {
         html.append("<body>");
 
         html.append("<div class='header'>");
-        html.append("<h1>Business Task Manager - Updated Version</h1>");
+        html.append("<h1>Business Task Manager - Updated Version </h1>");
         html.append("<p>Manage, monitor, and track tasks across the organization.</p>");
         html.append("</div>");
 
