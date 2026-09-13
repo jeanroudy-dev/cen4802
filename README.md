@@ -1,20 +1,24 @@
 Business Task Manager
 
-Author: Jean Roudy
+Author: Jean Roudy Alexis
 
 Description
 
 The Business Task Manager is a Java web application designed to help businesses manage and track tasks. Users can view tasks, descriptions, and statuses, and mark pending tasks as completed.
 
-The application uses Java 17, Jakarta REST, Apache Tomcat, Maven, Git, and GitHub.
+The application uses Java 17, Jakarta REST, Apache Tomcat, Maven, JUnit 5, Git, and GitHub.
 
 Build and Run
 
 The project uses Apache Maven as its automated build tool.
 
-To build the application from the command line, run:
+To build the application and execute unit tests from the command line, run:
 
 mvn clean package
+
+To execute automated tests without packaging the application, run:
+
+mvn test
 
 A successful build generates the following WAR artifact in the target directory:
 
@@ -34,7 +38,7 @@ The newly generated WAR file can then be deployed to Tomcat to run the updated v
 
 Project Structure
 
-The project follows the standard Maven directory structure:
+The project follows the standard Maven directory structure, separating application source code from automated unit tests:
 
 src/
 main/
@@ -43,14 +47,17 @@ com/example/cen4802taskmanager/
 HelloApplication.java
 HelloResource.java
 Task.java
-    resources/
-        META-INF/
-            beans.xml
+resources/
+META-INF/
+beans.xml
+test/
+java/
+com/example/cen4802taskmanager/
 pom.xml
 mvnw
 mvnw.cmd
 
-The pom.xml file contains the Maven project configuration, dependencies, Java version, and build settings.
+The pom.xml file contains the Maven project configuration, Java version, build settings, and JUnit 5 dependencies configured under the test scope.
 
 Version Control
 
