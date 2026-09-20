@@ -130,8 +130,10 @@ public class HelloResource {
         html.append("</div>");
 
         html.append("<div class='container'>");
+        html.append("<h2>Current Tasks (");
+        html.append(tasks.size());
+        html.append(")</h2>");
 
-        html.append("<h2>Current Tasks</h2>");
 
         for (Task task : tasks) {
 
