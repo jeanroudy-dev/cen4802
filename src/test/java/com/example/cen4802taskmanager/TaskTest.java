@@ -79,7 +79,8 @@ class TaskTest {
         List<Task> result = HelloResource.filterTasks(tasks, "pending");
 
         assertEquals(1, result.size());
-        assertEquals("Pending task", result.get(0).getTitle());
+        assertEquals("Wrong task title", result.get(0).getTitle());
+
     }
 
     @Test
