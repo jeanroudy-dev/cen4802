@@ -2,6 +2,8 @@ package com.example.cen4802taskmanager;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class TaskTest {
@@ -66,4 +68,43 @@ class TaskTest {
         assertTrue(task.isCompleted());
     }
 
+    @Test
+    void filterTasksReturnsOnlyPendingTasks() {
+        Task pending = new Task(1, "Pending task", "Description");
+        Task completed = new Task(2, "Completed task", "Description");
+        completed.setCompleted(true);
+
+        List<Task> tasks = List.of(pending, completed);
+
+        List<Task> result = HelloResource.filterTasks(tasks, "pending");
+
+        assertEquals(1, result.size());
+        assertEquals("Pending task", result.get(0).getTitle());
+    }
+
+    @Test
+    void filterTasksReturnsOnlyCompletedTasks() {
+        Task pending = new Task(1, "Pending task", "Description");
+        Task completed = new Task(2, "Completed task", "Description");
+        completed.setCompleted(true);
+
+        List<Task> tasks = List.of(pending, completed);
+
+        List<Task> result = HelloResource.filterTasks(tasks, "completed");
+
+        assertEquals(1, result.size());
+        assertEquals("Completed task", result.get(0).getTitle());
+    }
+
+    @Test
+    void filterTasksReturnsAllTasks() {
+        List<Task> tasks = List.of(
+                new Task(1, "First task", "Description"),
+                new Task(2, "Second task", "Description")
+        );
+
+        List<Task> result = HelloResource.filterTasks(tasks, "all");
+
+        assertEquals(2, result.size());
+    }
 }
