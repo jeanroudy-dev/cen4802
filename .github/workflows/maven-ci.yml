@@ -1,3 +1,4 @@
+
 name: Java CI
 
 on:
@@ -25,3 +26,6 @@ jobs:
 
       - name: Build, test, and package
         run: mvn clean package
+
+      - name: Build Docker image
+        run: docker build -t cen4802taskmanager:${{ github.sha }} .
