@@ -1,3 +1,4 @@
+
 package com.example.cen4802taskmanager;
 
 import jakarta.ws.rs.GET;
@@ -8,6 +9,7 @@ import jakarta.ws.rs.core.MediaType;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Path("/tasks")
 public class HelloResource {
@@ -40,9 +42,31 @@ public class HelloResource {
         ));
     }
 
+    static List<Task> filterTasks(List<Task> taskList, String status) {
+        String selectedStatus = status == null
+                ? "all"
+                : status.toLowerCase();
+
+        if (!selectedStatus.equals("all")
+                && !selectedStatus.equals("pending")
+                && !selectedStatus.equals("completed")) {
+            selectedStatus = "all";
+        }
+
+        final String filter = selectedStatus;
+
+        return taskList.stream()
+                .filter(task -> filter.equals("all")
+                        || (filter.equals("completed") && task.isCompleted())
+                        || (filter.equals("pending") && !task.isCompleted()))
+                .collect(Collectors.toList());
+    }
+
     @GET
     @Produces(MediaType.TEXT_HTML)
-    public String getTasks(@QueryParam("complete") Integer taskId) {
+    public String getTasks(
+            @QueryParam("complete") Integer taskId,
+            @QueryParam("status") String status) {
 
         if (taskId != null) {
             for (Task task : tasks) {
@@ -53,14 +77,19 @@ public class HelloResource {
             }
         }
 
+        String filter = status == null ? "all" : status.toLowerCase();
+        List<Task> filteredTasks = filterTasks(tasks, status);
+
         StringBuilder html = new StringBuilder();
 
         html.append("<!DOCTYPE html>");
         html.append("<html>");
         html.append("<head>");
+        html.append("<meta charset='UTF-8'>");
         html.append("<title>Business Task Manager</title>");
 
         html.append("<style>");
+
         html.append("body {");
         html.append("font-family: Arial, sans-serif;");
         html.append("margin: 0;");
@@ -87,6 +116,24 @@ public class HelloResource {
         html.append("max-width: 1000px;");
         html.append("margin: 30px auto;");
         html.append("padding: 0 20px;");
+        html.append("}");
+
+        html.append(".filters {");
+        html.append("margin: 20px 0;");
+        html.append("}");
+
+        html.append(".filters a {");
+        html.append("display: inline-block;");
+        html.append("margin: 0 8px 8px 0;");
+        html.append("padding: 10px 14px;");
+        html.append("background-color: #e5e7eb;");
+        html.append("color: #1f2937;");
+        html.append("text-decoration: none;");
+        html.append("border-radius: 5px;");
+        html.append("}");
+
+        html.append(".filters a:hover {");
+        html.append("background-color: #d1d5db;");
         html.append("}");
 
         html.append(".task {");
@@ -125,18 +172,26 @@ public class HelloResource {
         html.append("<body>");
 
         html.append("<div class='header'>");
-        html.append("<h1>Business Task Manager - Updated Version </h1>");
+        html.append("<h1>Business Task Manager - Docker Updated Version</h1>");
         html.append("<p>Manage, monitor, and track tasks across the organization.</p>");
         html.append("</div>");
 
         html.append("<div class='container'>");
         html.append("<h2>Current Tasks (");
-        html.append(tasks.size());
+        html.append(filteredTasks.size());
         html.append(")</h2>");
 
+        html.append("<div class='filters'>");
+        html.append("<a href='?status=all'>All Tasks</a>");
+        html.append("<a href='?status=pending'>Pending Tasks</a>");
+        html.append("<a href='?status=completed'>Completed Tasks</a>");
+        html.append("</div>");
 
-        for (Task task : tasks) {
+        if (filteredTasks.isEmpty()) {
+            html.append("<p>No tasks found for this filter.</p>");
+        }
 
+        for (Task task : filteredTasks) {
             html.append("<div class='task'>");
 
             html.append("<h2>");
@@ -149,8 +204,7 @@ public class HelloResource {
             html.append(task.getDescription());
             html.append("</p>");
 
-            html.append("<p class='status'>");
-            html.append("Status: ");
+            html.append("<p class='status'>Status: ");
 
             if (task.isCompleted()) {
                 html.append("Completed");
@@ -163,6 +217,8 @@ public class HelloResource {
             if (!task.isCompleted()) {
                 html.append("<a class='button' href='?complete=");
                 html.append(task.getId());
+                html.append("&amp;status=");
+                html.append(filter);
                 html.append("'>Mark as Completed</a>");
             }
 
@@ -170,7 +226,6 @@ public class HelloResource {
         }
 
         html.append("</div>");
-
         html.append("</body>");
         html.append("</html>");
 
