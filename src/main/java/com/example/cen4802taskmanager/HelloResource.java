@@ -1,4 +1,3 @@
-
 package com.example.cen4802taskmanager;
 
 import jakarta.ws.rs.GET;
@@ -6,6 +5,7 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
+import java.util.logging.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,6 +13,8 @@ import java.util.stream.Collectors;
 
 @Path("/tasks")
 public class HelloResource {
+    private static final Logger logger =
+            Logger.getLogger(HelloResource.class.getName());
 
     private static final List<Task> tasks = new ArrayList<>();
 
@@ -50,6 +52,12 @@ public class HelloResource {
         if (!selectedStatus.equals("all")
                 && !selectedStatus.equals("pending")
                 && !selectedStatus.equals("completed")) {
+
+            Logger.getLogger(HelloResource.class.getName()).warning(
+                    "Invalid task status filter received: " + selectedStatus
+                            + ". Defaulting to all tasks."
+            );
+
             selectedStatus = "all";
         }
 
@@ -67,18 +75,39 @@ public class HelloResource {
     public String getTasks(
             @QueryParam("complete") Integer taskId,
             @QueryParam("status") String status) {
+        logger.info("Task page requested. Status filter: "
+                + (status == null ? "all" : status)
+                + ", completion request ID: " + taskId);
+        logger.fine("Detailed diagnostic: getTasks() was called.");
 
         if (taskId != null) {
+            boolean taskFound = false;
+
             for (Task task : tasks) {
                 if (task.getId() == taskId) {
-                    task.setCompleted(true);
+                    if (!task.isCompleted()) {
+                        task.setCompleted(true);
+                        logger.info("Task completed successfully. ID: "
+                                + task.getId() + ", title: " + task.getTitle());
+                    } else {
+                        logger.warning("Task was already completed. ID: " + taskId);
+                    }
+
+                    taskFound = true;
                     break;
                 }
+            }
+
+            if (!taskFound) {
+                logger.severe("Task completion failed because the task was not found. ID: "
+                        + taskId);
             }
         }
 
         String filter = status == null ? "all" : status.toLowerCase();
         List<Task> filteredTasks = filterTasks(tasks, status);
+        logger.info("Task filter applied: " + filter
+                + ". Matching tasks: " + filteredTasks.size());
 
         StringBuilder html = new StringBuilder();
 

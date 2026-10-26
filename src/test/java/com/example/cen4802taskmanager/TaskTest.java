@@ -80,6 +80,7 @@ class TaskTest {
 
         assertEquals(1, result.size());
         assertEquals("Pending task", result.get(0).getTitle());
+
     }
 
     @Test
