@@ -50,6 +50,7 @@ Task.java
 resources/
 META-INF/
 beans.xml
+logging.properties
 test/
 java/
 com/example/cen4802taskmanager/
@@ -152,6 +153,7 @@ kubectl port-forward service/taskmanager-service 8081:8080
 Keep the terminal running while accessing the application.
 
 The verified API endpoint is:
+
 http://localhost:8081/api/tasks
 
 This endpoint was tested in a web browser and returned a response from the deployed Java application.
@@ -204,6 +206,58 @@ The project workflow uses Git and GitHub to manage source code changes and revie
 
 Automated testing helps identify problems before changes are merged or packaged for deployment. Containerization and Kubernetes extend this workflow by providing a way to run, inspect, and manage the application in a deployment environment.
 
+Application Logging
+
+The Business Task Manager uses Java's built-in logging facility, java.util.logging, to record meaningful events during application execution. Logging is integrated into the HelloResource class so that task requests, filter operations, and task completion requests can be monitored while the application runs.
+
+The logging configuration file is located at:
+
+src/main/resources/logging.properties
+
+The configuration defines the logging levels, console handler, and output format. Log messages include timestamps, severity levels, logger names, and descriptive messages. The console was selected as the logging destination because it provides immediate access to application activity during development and testing through the IntelliJ Tomcat console. In a production environment, logs could also be directed to retained files or a centralized logging service for longer-term analysis.
+
+Logging Levels
+
+The application demonstrates multiple logging levels to distinguish normal activity from conditions that may require investigation.
+
+INFO records routine events, such as task page requests and the number of tasks matching a filter.
+
+WARNING records unexpected input, including invalid task status filters and requests that reference nonexistent tasks.
+
+FINE records detailed diagnostic information about method execution. These messages provide additional information when more detailed troubleshooting is needed.
+
+SEVERE records error conditions, such as an attempt to complete a task that does not exist. The message includes the requested task ID to help identify the problem.
+
+Logging Implementation and Testing
+
+The logging implementation was tested through the running web application. Opening the task endpoint generates INFO messages for task page requests and filter operations. Requests using pending and completed filters demonstrate how the application records different operations.
+
+An invalid status request can be tested using:
+
+http://localhost:8080/cen4802taskmanager/api/tasks?status=invalid
+
+The application logs a WARNING message identifying the invalid filter and falls back to all tasks.
+
+A missing task completion request can be tested using:
+
+http://localhost:8080/cen4802taskmanager/api/tasks?complete=999
+
+The application logs a SEVERE message containing the nonexistent task ID. This allows developers to identify the failed operation without terminating the application.
+
+Log Generation and Examination
+
+Repeated requests to the application were used to generate more than 100 runtime log entries. Each request generates messages for task page access and filter operations. This demonstrates that log entries result from real application interactions rather than a collection of predetermined messages.
+
+The logs can be examined in the IntelliJ Tomcat console. Searching for terms such as WARNING, SEVERE, and FINE helps isolate particular events. For example, searching for SEVERE identifies the failed completion request for task ID 999. This examination process helps developers recognize unexpected conditions and understand application behavior.
+
+Logging Configuration Changes
+
+The logging configuration was modified to demonstrate how the amount of diagnostic information can be controlled. The application logging level was changed from INFO to FINE, which enabled detailed diagnostic messages that were not displayed at the INFO level.
+
+After restarting Tomcat and refreshing the application, the FINE message appeared alongside the normal INFO messages. The configuration was then changed back to INFO to demonstrate that the detailed diagnostic message was filtered out while routine informational messages remained visible.
+
+This comparison demonstrates how logging levels can be adjusted for different operational needs. INFO is appropriate for routine monitoring, while FINE can provide additional detail during development and troubleshooting.
+
 Technologies Used
 
 Java 17: Application programming language.
@@ -215,6 +269,8 @@ Apache Tomcat 10.1: Java web application runtime.
 Apache Maven: Build automation and dependency management.
 
 JUnit 5: Automated unit testing.
+
+Java Util Logging: Application event logging and diagnostic information.
 
 Docker: Application containerization.
 
