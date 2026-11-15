@@ -18,9 +18,11 @@ mvn clean package
 
 To execute automated tests without packaging the application, run:
 
+
 mvn test
 
 A successful build generates the following WAR artifact in the target directory:
+
 
 target/cen4802taskmanager-1.0-SNAPSHOT.war
 
@@ -77,3 +79,30 @@ Filtering tasks
 Database storage
 User authentication
 Improved task management and reporting
+
+Infrastructure as Code (Terraform)
+
+The project uses Terraform to implement Infrastructure as Code (IaC) and manage Docker resources.
+
+The Terraform configuration provisions the following resources:
+
+- A Docker application container running the Business Task Manager.
+- A dedicated Docker network.
+- A persistent Docker volume for Tomcat logs.
+- A container memory limit of 768 MB.
+
+The application container is accessible through:
+
+http://localhost:8081/api/tasks
+
+Terraform commands used to manage the infrastructure include:
+
+terraform init
+terraform validate
+terraform plan
+terraform apply
+terraform destroy
+
+The application was tested successfully, and Terraform was used to modify the container memory allocation and verify the change. After testing, Terraform successfully destroyed the managed resources.
+
+The existing Docker application image was retained locally.
