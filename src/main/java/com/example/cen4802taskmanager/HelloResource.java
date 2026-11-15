@@ -80,7 +80,7 @@ public class HelloResource {
         String filter = status == null ? "all" : status.toLowerCase();
         List<Task> filteredTasks = filterTasks(tasks, status);
 
-        StringBuilder html = new StringBuilder();
+        StringBuilder html = new StringBuilder(8192);
 
         html.append("<!DOCTYPE html>");
         html.append("<html>");
